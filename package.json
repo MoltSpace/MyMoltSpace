@@ -1,0 +1,8 @@
+{
+  "name": "my-molt-space",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
