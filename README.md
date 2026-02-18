@@ -1,119 +1,219 @@
-My Molt Space
+# My Molt Space
 
-Redirected from Molt → Conway-native infrastructure.
+```
+MOLT → CONWAY REDIRECT
+```
 
-My Molt Space has transitioned from a standalone Molt architecture into a Conway-aligned system.
+Memory-first coordination layer, now refactored under Conway runtime constraints.
 
-What began as Molt memory-first AI DAO infrastructure is now structured under Conway architectural principles and designed to operate within the Automaton runtime.
+Originally Molt-native.  
+Now Conway-aligned.
 
-Infrastructure evolves.
-Invariants remain.
+State model unchanged.  
+Execution substrate replaced.
 
-Overview
+---
 
-My Molt Space is a Conway-structured memory-first coordination layer for AI-native DAOs.
+## Context
 
-Originally developed under the Molt framework, the system has been refactored to align with:
+Molt was a memory experiment.  
+Conway is the execution substrate.
 
-Conway runtime primitives
+This repository now assumes:
 
-Automaton execution model
+```
+Execution = Conway Automaton
+State     = Append-only MoltMemory
+Authority = Deterministic consensus only
+Synthesis ≠ Control
+```
 
-Deterministic infrastructure governance
+No UX layer.  
+No mutable state.  
+No non-deterministic writes.
 
-Sovereign agent compatibility
+---
 
-The focus remains unchanged:
+## System Model
 
-Guild-scoped identity
+My Molt Space implements a constrained coordination graph:
 
-Append-only memory
-
-Deterministic consensus
-
-Synthesis without authority
-
-What changes is the base layer.
-
-From Molt to Conway
-
-Molt introduced:
-
-Immutable memory ledgers
-
-Guild-bound identity
-
-Deterministic write gating
-
-MOLDbot synthesis layer
-
-Conway provides:
-
-Autonomous compute
-
-Agent lifecycle management
-
-Sovereign infrastructure primitives
-
-Runtime-level determinism
-
-My Molt Space now integrates both — preserving Molt’s memory invariants while adopting Conway’s execution architecture.
-
-Architectural Model (Conway-Aligned)
+```
 Guild
+ ├─ Agents (stateless)
+ ├─ MoltMemory (append-only)
+ └─ Consensus Gate (write barrier)
+```
 
-Primary identity boundary.
-No standalone users.
-All agents operate within a guild scope.
+### Identity Boundary
 
-Agents
+```
+∀ actor ∈ system:
+    actor.guildId ≠ null
+```
 
-Stateless executors bound to a guild.
-Execution is runtime-managed via Conway Automaton.
+No standalone users.  
+No global identity scope.
 
-MoltMemory
+Guild is the only namespace.
 
-Append-only ledger.
-Immutable.
-Hash-addressed.
-Deterministic sequence ordering.
+---
 
-Consensus Layer
+## Execution Model (Conway-Aligned)
 
-Write-gated memory commits.
-No non-deterministic state mutation.
-Decision finality is protocol-enforced.
+```
+Automaton Loop:
+    read(memory)
+    evaluate(proposal)
+    enforce(consensus_rules)
+    append(state_delta)
+```
 
-MOLDbot
+No mutation.  
+Only extension.
 
-Context synthesis engine.
-Not an authority.
-Cannot override consensus.
+Memory behaves as:
 
-System Stack
-Layer	Technology
-Runtime	Conway Automaton
-Memory	Append-only ledger (hash-addressed)
-Consensus	Deterministic write gating
-DB	Prisma + SQLite (dev)
-Execution	NodeNext / TypeScript
-Orchestration	Turbo + pnpm workspaces
-Non-Goals
+```
+state(n+1) = state(n) ⊕ delta
+```
 
-Social feeds
+Where:
 
-Engagement mechanics
+- ⊕ = append-only extension
+- No in-place modification
+- No overwrite semantics
 
-Influencer-style agents
+---
 
-UX-first design
+## MoltMemory Invariants
 
-This repository prioritizes protocol invariants over speed.
+Each memory node satisfies:
 
-Status
+```
+hash = H(payload || parentHash || seq)
+```
 
-Early-stage.
-Interfaces unstable.
-Architecture prioritized over iteration speed.
+Properties:
 
-Transition to Conway runtime in progress.
+- Collision-resistant identity
+- Deterministic ordering via seq
+- Optional chain pointer via parentId
+- Guild-scoped isolation
+
+```
+(guildId, seq) → total order
+```
+
+No cross-guild bleed.
+
+---
+
+## Consensus Layer
+
+Write gating is deterministic.
+
+```
+if proposal.valid && invariant_check(pass):
+    commit()
+else:
+    reject()
+```
+
+No probabilistic finality.  
+No governance token voting.  
+No soft consensus.
+
+Consensus is a barrier, not a poll.
+
+---
+
+## MOLDbot
+
+Synthesis engine only.
+
+```
+memory → summarize(context)
+memory → compress(signal)
+memory → detect(pattern)
+```
+
+It cannot:
+
+- Write decisions
+- Override consensus
+- Mutate memory
+
+Synthesis ≠ Authority.
+
+---
+
+## Conway Integration
+
+```
+Compute:  Conway Automaton
+Agents:   Runtime-managed executors
+State:    Molt append-only ledger
+Coord:    Deterministic write barrier
+```
+
+Conway handles lifecycle + infra.  
+Molt handles memory + invariants.
+
+Separation of concerns enforced at architecture level.
+
+---
+
+## Package Topology
+
+```
+apps/
+  api/        → HTTP boundary (minimal surface)
+  web/        → Optional interface
+
+packages/
+  core/       → types + crypto primitives
+  memory/     → invariants + ledger rules
+  consensus/  → write barrier logic
+  moldbot/    → synthesis engine
+```
+
+Monorepo via:
+
+```
+pnpm workspace
+turbo task graph
+prisma schema
+NodeNext modules
+```
+
+No dynamic runtime injection.  
+No plugin system.
+
+Determinism > extensibility.
+
+---
+
+## Non-Goals
+
+```
+✗ Social graphs
+✗ Feed mechanics
+✗ Token-based governance
+✗ Mutable user profiles
+✗ Engagement loops
+```
+
+---
+
+## Status
+
+```
+Stage: Early
+Interfaces: Unstable
+Invariants: Locked
+Execution: Migrating to Conway runtime
+```
+
+Infrastructure first.  
+Interface later.
