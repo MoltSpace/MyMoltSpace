@@ -1,230 +1,119 @@
-# My Molt Space
+My Molt Space
 
-Memory-first AI DAO infrastructure.
+Redirected from Molt → Conway-native infrastructure.
 
-Guild-scoped agents, append-only memory, deterministic consensus, and MOLDbot-driven synthesis.
-This repository focuses on protocol and system design, not UX.
+My Molt Space has transitioned from a standalone Molt architecture into a Conway-aligned system.
 
-# My Molt Space
+What began as Molt memory-first AI DAO infrastructure is now structured under Conway architectural principles and designed to operate within the Automaton runtime.
 
-Memory-first AI DAO infrastructure.
+Infrastructure evolves.
+Invariants remain.
 
-My Molt Space is an experimental system for building AI-native DAOs where
-intelligence is collective, persistent, and governed by deterministic rules.
+Overview
 
-## Core Principles
+My Molt Space is a Conway-structured memory-first coordination layer for AI-native DAOs.
 
-- Guild-scoped identity (no standalone users)
-- Append-only memory as the source of truth
-- Deterministic consensus for decision-making
-- MOLDbot for synthesis, not authority
+Originally developed under the Molt framework, the system has been refactored to align with:
 
-## Architecture Overview
+Conway runtime primitives
 
-- **Guilds**: Primary identity boundary
-- **Agents**: Stateless executors bound to a guild
-- **MoltMemory**: Immutable memory ledger
-- **Consensus Layer**: Gated decision writes
-- **MOLDbot**: Context synthesis and summarization
+Automaton execution model
 
-## Non-Goals
+Deterministic infrastructure governance
 
-- Social feeds
-- Engagement mechanics
-- Individual agent branding
+Sovereign agent compatibility
 
-This repository focuses on infrastructure, not UX.
+The focus remains unchanged:
 
-## Status
+Guild-scoped identity
 
-Early-stage. Interfaces unstable.  
-Design decisions prioritized over speed.
+Append-only memory
 
+Deterministic consensus
 
-my-molt-space/
-  README.md
-  package.json
-  pnpm-workspace.yaml
-  turbo.json
-  tsconfig.base.json
-  .gitignore
-  .env.example
+Synthesis without authority
 
-  prisma/
-    schema.prisma
+What changes is the base layer.
 
-  apps/
-    api/
-      package.json
-      tsconfig.json
-      src/
-        index.ts
-        server.ts
-        env.ts
-        routes/
-          health.ts
-          guild.ts
-          memory.ts
-        lib/
-          prisma.ts
+From Molt to Conway
 
-    web/
-      package.json
-      tsconfig.json
-      next.config.mjs
-      app/
-        layout.tsx
-        page.tsx
+Molt introduced:
 
-  packages/
-    core/
-      package.json
-      tsconfig.json
-      src/
-        index.ts
-        types.ts
-        crypto.ts
+Immutable memory ledgers
 
-    memory/
-      package.json
-      tsconfig.json
-      src/
-        index.ts
-        invariants.ts
+Guild-bound identity
 
-    consensus/
-      package.json
-      tsconfig.json
-      src/
-        index.ts
+Deterministic write gating
 
-    moldbot/
-      package.json
-      tsconfig.json
-      src/
-        index.ts
+MOLDbot synthesis layer
 
-  scripts/
-    dev.sh
+Conway provides:
 
-    {
-  "name": "my-molt-space",
-  "private": true,
-  "packageManager": "pnpm@9.0.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "lint": "turbo lint",
-    "typecheck": "turbo typecheck",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
-  },
-  "devDependencies": {
-    "turbo": "^2.0.0",
-    "typescript": "^5.5.0",
-    "prisma": "^5.18.0"
-  }
-}
+Autonomous compute
 
-packages:
-  - "apps/*"
-  - "packages/*"
+Agent lifecycle management
 
-  {
-  "tasks": {
-    "dev": { "cache": false, "persistent": true },
-    "build": { "dependsOn": ["^build"], "outputs": ["dist/**", ".next/**"] },
-    "lint": { "dependsOn": ["^lint"] },
-    "typecheck": { "dependsOn": ["^typecheck"] }
-  }
-}
+Sovereign infrastructure primitives
 
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "strict": true,
-    "declaration": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
-  }
-}
-node_modules
-dist
-.next
-.env
-.env.local
-.DS_Store
-prisma/dev.db
-generator client {
-  provider = "prisma-client-js"
-}
+Runtime-level determinism
 
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
+My Molt Space now integrates both — preserving Molt’s memory invariants while adopting Conway’s execution architecture.
 
-model Guild {
-  id           String   @id @default(cuid())
-  slug         String   @unique
-  displayName  String
-  memoryRootId String
-  createdAt    DateTime @default(now())
+Architectural Model (Conway-Aligned)
+Guild
 
-  agents       Agent[]
-  memories     MoltMemory[]
-}
+Primary identity boundary.
+No standalone users.
+All agents operate within a guild scope.
 
-model Agent {
-  id        String   @id @default(cuid())
-  guildId   String
-  role      String
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
+Agents
 
-  guild     Guild    @relation(fields: [guildId], references: [id])
+Stateless executors bound to a guild.
+Execution is runtime-managed via Conway Automaton.
 
-  @@index([guildId])
-}
+MoltMemory
 
-model MoltMemory {
-  id        String   @id @default(cuid())
-  guildId   String
-  type      String   // DISCUSSION | SUMMARY | DECISION | EXECUTION
-  payload   Json
-  hash      String   @unique
-  seq       Int
-  parentId  String?  // optional chain pointer
-  createdAt DateTime @default(now())
+Append-only ledger.
+Immutable.
+Hash-addressed.
+Deterministic sequence ordering.
 
-  guild     Guild    @relation(fields: [guildId], references: [id])
+Consensus Layer
 
-  @@index([guildId, seq])
-}
-{
-  "name": "@molt/core",
-  "version": "0.0.1",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
-  "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "echo \"(add eslint later)\""
-  }
-}
-{
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist"
-  },
-  "include": ["src"]
-}
+Write-gated memory commits.
+No non-deterministic state mutation.
+Decision finality is protocol-enforced.
 
+MOLDbot
+
+Context synthesis engine.
+Not an authority.
+Cannot override consensus.
+
+System Stack
+Layer	Technology
+Runtime	Conway Automaton
+Memory	Append-only ledger (hash-addressed)
+Consensus	Deterministic write gating
+DB	Prisma + SQLite (dev)
+Execution	NodeNext / TypeScript
+Orchestration	Turbo + pnpm workspaces
+Non-Goals
+
+Social feeds
+
+Engagement mechanics
+
+Influencer-style agents
+
+UX-first design
+
+This repository prioritizes protocol invariants over speed.
+
+Status
+
+Early-stage.
+Interfaces unstable.
+Architecture prioritized over iteration speed.
+
+Transition to Conway runtime in progress.
